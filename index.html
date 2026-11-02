@@ -373,8 +373,7 @@
 
         function renderRegionFilters() {
             const citySelect = document.getElementById('cityFilterSelect');
-            const districtSelect = document.getElementById('districtFilterSelect');
-            if (!citySelect || !districtSelect) return;
+            if (!citySelect) return;
 
             const cities = Array.from(new Set(clients.map(c => extractRegion(c.address).city).filter(Boolean)));
             
