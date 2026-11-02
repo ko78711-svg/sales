@@ -807,6 +807,28 @@
                 .replace(/'/g, "&#039;");
         }
 
+        // Load saved data safely from LocalStorage
+        function loadSavedData() {
+            const savedData = localStorage.getItem('client_visit_data');
+            const hasInitialized = localStorage.getItem('client_visit_initialized');
+
+            if (savedData !== null) {
+                try {
+                    clients = JSON.parse(savedData);
+                } catch (e) {
+                    console.error('Failed to parse saved data', e);
+                    clients = [];
+                }
+            } else if (!hasInitialized) {
+                // Initial launch: set default sample data once
+                clients = getSampleData();
+                localStorage.setItem('client_visit_data', JSON.stringify(clients));
+                localStorage.setItem('client_visit_initialized', 'true');
+            } else {
+                clients = [];
+            }
+        }
+
         // App Initialization
         window.onload = function() {
             loadSavedData();
