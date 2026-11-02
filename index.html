@@ -799,7 +799,7 @@
                     `"${(c.phone || '').replace(/"/g, '""')}"`,
                     `"${(c.address || '').replace(/"/g, '""')}"`,
                     `"${c.visitDate}"`,
-                    `"${c.status}"`,
+                    `"${c.status || '未拜訪'}"`,
                     `"${(c.notes || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`
                 ];
                 csvContent += row.join(",") + "\n";
@@ -836,7 +836,12 @@
                 try {
                     const imported = JSON.parse(e.target.result);
                     if (Array.isArray(imported)) {
-                        clients = imported;
+                        // Ensure all imported items default status to '未拜訪' if empty/missing
+                        clients = imported.map(item => ({
+                            ...item,
+                            status: item.status || '未拜訪',
+                            visitDate: item.visitDate || new Date().toISOString().split('T')[0]
+                        }));
                         saveData();
                         closeImportExportModal();
                         showToast('已成功匯入資料！');
