@@ -51,9 +51,6 @@
             </div>
         </div>
         <div class="flex items-center space-x-1.5">
-            <button onclick="openInstallInstructions()" title="如何安裝到 iPhone" class="p-2 text-indigo-100 hover:text-white hover:bg-indigo-700/50 rounded-lg transition">
-                <i class="fa-solid fa-mobile-screen-button text-lg"></i>
-            </button>
             <button onclick="openImportExportModal()" title="資料匯入/備份" class="p-2 text-indigo-100 hover:text-white hover:bg-indigo-700/50 rounded-lg transition">
                 <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
             </button>
@@ -90,8 +87,18 @@
         <div class="flex items-center space-x-1.5 overflow-x-auto pt-1 text-xs scrollbar-none border-t border-slate-100" id="industryFilterPills">
             <span class="text-[11px] text-slate-400 font-semibold flex-shrink-0 me-1">產業：</span>
             <button onclick="setIndustryFilter('ALL')" data-industry="ALL" class="industry-pill bg-slate-700 text-white px-2.5 py-1 rounded-lg font-medium transition whitespace-nowrap">全部產業</button>
-            <!-- Dynamic Industry Buttons inserted via JS -->
             <div id="dynamicIndustryPills" class="flex items-center space-x-1.5"></div>
+        </div>
+
+        <!-- City & District Filter Dropdowns -->
+        <div class="flex items-center space-x-2 pt-1 border-t border-slate-100 text-xs">
+            <span class="text-[11px] text-slate-400 font-semibold flex-shrink-0"><i class="fa-solid fa-map-pin me-1"></i>地區：</span>
+            <select id="cityFilterSelect" onchange="onCityFilterChange(this.value)" class="bg-slate-100 border border-slate-200 text-slate-700 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                <option value="ALL">全部縣市</option>
+            </select>
+            <select id="districtFilterSelect" onchange="onDistrictFilterChange(this.value)" class="bg-slate-100 border border-slate-200 text-slate-700 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                <option value="ALL">全部鄉鎮市區</option>
+            </select>
         </div>
     </div>
 
@@ -306,42 +313,6 @@
         </div>
     </div>
 
-    <!-- iOS Install Instruction Modal -->
-    <div id="installModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col p-5 space-y-4">
-            <div class="flex items-center justify-between border-b pb-3">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-brands fa-apple text-xl text-slate-800"></i>
-                    <h3 class="font-bold text-slate-800 text-base">安裝到 iPhone 桌面教學</h3>
-                </div>
-                <button onclick="closeInstallInstructions()" class="text-slate-400 hover:text-slate-600">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            
-            <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
-                <div class="flex items-start space-x-3 bg-indigo-50 p-3 rounded-xl text-indigo-900">
-                    <span class="font-bold bg-indigo-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] flex-shrink-0 mt-0.5">1</span>
-                    <p>請確保您是使用 <strong>Safari 瀏覽器</strong> 開啟這個頁面。</p>
-                </div>
-                <div class="flex items-start space-x-3 bg-slate-50 p-3 rounded-xl">
-                    <span class="font-bold bg-slate-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] flex-shrink-0 mt-0.5">2</span>
-                    <p>點擊 Safari 螢幕下方正中間的 <strong>「分享」按鈕</strong> <i class="fa-solid fa-arrow-up-from-bracket text-indigo-600 font-bold mx-1"></i>。</p>
-                </div>
-                <div class="flex items-start space-x-3 bg-slate-50 p-3 rounded-xl">
-                    <span class="font-bold bg-slate-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] flex-shrink-0 mt-0.5">3</span>
-                    <p>在彈出選單中下滑，找到並點選 <strong>「新增至主畫面」</strong> <i class="fa-regular fa-square-plus text-slate-700 font-bold mx-1"></i>。</p>
-                </div>
-                <div class="flex items-start space-x-3 bg-slate-50 p-3 rounded-xl">
-                    <span class="font-bold bg-slate-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] flex-shrink-0 mt-0.5">4</span>
-                    <p>點擊右上角的 <strong>「新增」</strong>，即可完成安裝！桌面會出現獨立的 App 圖示。</p>
-                </div>
-            </div>
-
-            <button onclick="closeInstallInstructions()" class="w-full py-2.5 bg-indigo-600 rounded-xl font-medium text-white text-xs hover:bg-indigo-700 transition">知道了</button>
-        </div>
-    </div>
-
     <!-- Toast Notification -->
     <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white text-xs px-4 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-300 flex items-center space-x-2">
         <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -370,8 +341,22 @@
         let currentTab = 'today';
         let currentStatusFilter = 'ALL';
         let currentIndustryFilter = 'ALL';
+        let currentCityFilter = 'ALL';
+        let currentDistrictFilter = 'ALL';
         let selectedClientIds = new Set();
         let deleteTargetId = null;
+
+        function extractRegion(address) {
+            if (!address) return { city: '', district: '' };
+            const match = address.match(/(.{2,3}[縣市])(.{2,4}[區市鎮鄉])?/);
+            if (match) {
+                return {
+                    city: match[1] || '',
+                    district: match[2] || ''
+                };
+            }
+            return { city: '', district: '' };
+        }
 
         function getStatusBadge(status) {
             const map = {
@@ -384,6 +369,46 @@
             };
             const cls = map[status] || 'bg-slate-100 text-slate-600 border-slate-200';
             return `<span class="px-2.5 py-0.5 rounded-md border text-[11px] font-semibold ${cls}">${status}</span>`;
+        }
+
+        function renderRegionFilters() {
+            const citySelect = document.getElementById('cityFilterSelect');
+            const districtSelect = document.getElementById('districtFilterSelect');
+            if (!citySelect || !districtSelect) return;
+
+            const cities = Array.from(new Set(clients.map(c => extractRegion(c.address).city).filter(Boolean)));
+            
+            citySelect.innerHTML = `<option value="ALL">全部縣市 (${cities.length})</option>` +
+                cities.map(c => `<option value="${escapeHtml(c)}" ${c === currentCityFilter ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('');
+
+            updateDistrictOptions();
+        }
+
+        function updateDistrictOptions() {
+            const districtSelect = document.getElementById('districtFilterSelect');
+            if (!districtSelect) return;
+
+            let relevantClients = clients;
+            if (currentCityFilter !== 'ALL') {
+                relevantClients = clients.filter(c => extractRegion(c.address).city === currentCityFilter);
+            }
+
+            const districts = Array.from(new Set(relevantClients.map(c => extractRegion(c.address).district).filter(Boolean)));
+
+            districtSelect.innerHTML = `<option value="ALL">全部鄉鎮市區</option>` +
+                districts.map(d => `<option value="${escapeHtml(d)}" ${d === currentDistrictFilter ? 'selected' : ''}>${escapeHtml(d)}</option>`).join('');
+        }
+
+        function onCityFilterChange(city) {
+            currentCityFilter = city;
+            currentDistrictFilter = 'ALL';
+            updateDistrictOptions();
+            renderClients();
+        }
+
+        function onDistrictFilterChange(district) {
+            currentDistrictFilter = district;
+            renderClients();
         }
 
         function renderIndustryPills() {
@@ -485,6 +510,15 @@
                     return false;
                 }
 
+                const region = extractRegion(c.address);
+                if (currentCityFilter !== 'ALL' && region.city !== currentCityFilter) {
+                    return false;
+                }
+
+                if (currentDistrictFilter !== 'ALL' && region.district !== currentDistrictFilter) {
+                    return false;
+                }
+
                 if (searchVal) {
                     const matchesName = (c.name || '').toLowerCase().includes(searchVal);
                     const matchesIndustry = (c.industryType || '').toLowerCase().includes(searchVal);
@@ -511,6 +545,7 @@
                 const isToday = item.visitDate === todayStr;
                 const isOverdue = item.visitDate < todayStr;
                 const isChecked = selectedClientIds.has(item.id);
+                const region = extractRegion(item.address);
                 
                 let dateBadgeClass = 'text-slate-500 bg-slate-100';
                 let dateText = item.visitDate;
@@ -534,6 +569,7 @@
                                 <div class="flex items-center space-x-1.5 flex-wrap">
                                     <h2 class="font-bold text-slate-800 text-base leading-snug">${escapeHtml(item.name)}</h2>
                                     ${item.industryType ? `<span class="bg-indigo-50 text-indigo-700 text-[10px] px-2 py-0.5 rounded-md font-semibold border border-indigo-100"><i class="fa-solid fa-briefcase me-1"></i>${escapeHtml(item.industryType)}</span>` : ''}
+                                    ${region.city ? `<span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-medium"><i class="fa-solid fa-location-dot me-0.5 text-indigo-500"></i>${escapeHtml(region.city)}${escapeHtml(region.district)}</span>` : ''}
                                 </div>
                                 <div class="inline-block mt-1">
                                     <span class="text-[11px] px-2 py-0.5 rounded-full ${dateBadgeClass}">
@@ -836,7 +872,6 @@
                 try {
                     const imported = JSON.parse(e.target.result);
                     if (Array.isArray(imported)) {
-                        // Ensure all imported items default status to '未拜訪' if empty/missing
                         clients = imported.map(item => ({
                             ...item,
                             status: item.status || '未拜訪',
@@ -902,12 +937,14 @@
             localStorage.setItem('client_visit_data', dataStr);
             localStorage.setItem('client_visit_data_backup', dataStr);
             renderIndustryPills();
+            renderRegionFilters();
             renderClients();
         }
 
         window.onload = function() {
             loadSavedData();
             renderIndustryPills();
+            renderRegionFilters();
             renderClients();
         };
     </script>
