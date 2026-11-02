@@ -332,7 +332,6 @@
         let currentStatusFilter = 'ALL';
         let deleteTargetId = null;
 
-        // Open Install Instructions Modal
         function openInstallInstructions() {
             document.getElementById('installModal').classList.remove('hidden');
         }
@@ -341,7 +340,6 @@
             document.getElementById('installModal').classList.add('hidden');
         }
 
-        // Initial Sample Data Generator
         function getSampleData() {
             const today = new Date().toISOString().split('T')[0];
             const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
@@ -386,13 +384,13 @@
             ];
         }
 
-        // Save data to localStorage
         function saveData() {
-            localStorage.setItem('client_visit_data', JSON.stringify(clients));
+            const dataStr = JSON.stringify(clients);
+            localStorage.setItem('client_visit_data', dataStr);
+            localStorage.setItem('client_visit_data_backup', dataStr);
             renderClients();
         }
 
-        // Status Colors Mapping
         function getStatusBadge(status) {
             const map = {
                 '初訪': 'bg-sky-100 text-sky-700 border-sky-200',
@@ -405,41 +403,33 @@
             return `<span class="px-2.5 py-0.5 rounded-md border text-[11px] font-semibold ${cls}">${status}</span>`;
         }
 
-        // Render Client List
         function renderClients() {
             const listEl = document.getElementById('clientList');
             const emptyEl = document.getElementById('emptyState');
             const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
             const todayStr = new Date().toISOString().split('T')[0];
 
-            // Clear input button state
             document.getElementById('clearSearchBtn').classList.toggle('hidden', searchVal === '');
 
-            // Filter logic
             let filtered = clients.filter(c => {
-                // Tab filter
                 if (currentTab === 'today') {
-                    // 今日或過期未處理的
                     if (c.visitDate > todayStr) return false;
                 }
                 
-                // Status Filter
                 if (currentStatusFilter !== 'ALL' && c.status !== currentStatusFilter) {
                     return false;
                 }
 
-                // Keyword Search
                 if (searchVal) {
                     const matchesName = c.name.toLowerCase().includes(searchVal);
                     const matchesAddress = c.address.toLowerCase().includes(searchVal);
-                    const matchesPhone = c.phone.includes(searchVal);
+                    const matchesPhone = (c.phone || '').includes(searchVal);
                     return matchesName || matchesAddress || matchesPhone;
                 }
 
                 return true;
             });
 
-            // Sort by Visit Date (Nearest first)
             filtered.sort((a, b) => new Date(a.visitDate) - new Date(b.visitDate));
 
             if (filtered.length === 0) {
@@ -469,7 +459,6 @@
 
                 return `
                 <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition space-y-3">
-                    <!-- Top header: Name & Status -->
                     <div class="flex items-start justify-between space-x-2">
                         <div>
                             <h2 class="font-bold text-slate-800 text-base leading-snug">${escapeHtml(item.name)}</h2>
@@ -484,7 +473,6 @@
                         </div>
                     </div>
 
-                    <!-- Details: Address & Phone -->
                     <div class="text-xs text-slate-600 space-y-1.5 bg-slate-50 p-2.5 rounded-xl">
                         <div class="flex items-center text-slate-700">
                             <i class="fa-solid fa-location-dot w-4 text-indigo-500 flex-shrink-0"></i>
@@ -504,7 +492,6 @@
                         ` : ''}
                     </div>
 
-                    <!-- Quick Actions Buttons -->
                     <div class="grid grid-cols-4 gap-2 pt-1">
                         <a href="${mapUrl}" target="_blank" class="col-span-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2 flex flex-col items-center justify-center text-[11px] font-medium transition shadow-sm">
                             <i class="fa-solid fa-diamond-turn-right text-sm mb-0.5"></i>
@@ -531,7 +518,6 @@
             }).join('');
         }
 
-        // Tab Switching
         function switchTab(tab) {
             currentTab = tab;
             const tabToday = document.getElementById('tabToday');
@@ -547,7 +533,6 @@
             renderClients();
         }
 
-        // Status Filter Pill Click
         function setStatusFilter(status) {
             currentStatusFilter = status;
             const pills = document.querySelectorAll('.filter-pill');
@@ -561,13 +546,11 @@
             renderClients();
         }
 
-        // Search Reset
         function clearSearch() {
             document.getElementById('searchInput').value = '';
             renderClients();
         }
 
-        // Open Add Modal
         function openAddModal() {
             document.getElementById('modalTitle').innerText = '新增客戶拜訪';
             document.getElementById('clientId').value = '';
@@ -576,7 +559,6 @@
             document.getElementById('clientModal').classList.remove('hidden');
         }
 
-        // Open Edit Modal
         function editClient(id) {
             const client = clients.find(c => c.id === id);
             if (!client) return;
@@ -593,12 +575,10 @@
             document.getElementById('clientModal').classList.remove('hidden');
         }
 
-        // Close Modal
         function closeModal() {
             document.getElementById('clientModal').classList.add('hidden');
         }
 
-        // Save Client (Create or Update)
         function saveClient(e) {
             e.preventDefault();
 
@@ -611,14 +591,12 @@
             const notes = document.getElementById('visitNotes').value.trim();
 
             if (id) {
-                // Update
                 const index = clients.findIndex(c => c.id === id);
                 if (index !== -1) {
                     clients[index] = { id, name, phone, address, visitDate, status, notes };
                     showToast('已成功更新客戶資料');
                 }
             } else {
-                // Create
                 const newClient = {
                     id: 'client-' + Date.now(),
                     name, phone, address, visitDate, status, notes
@@ -631,7 +609,6 @@
             closeModal();
         }
 
-        // Delete Client Modal Trigger
         function deleteClient(id) {
             const client = clients.find(c => c.id === id);
             if (!client) return;
@@ -655,7 +632,6 @@
             }
         };
 
-        // Open Check-in / Log Visit Modal
         function openCheckinModal(id) {
             const client = clients.find(c => c.id === id);
             if (!client) return;
@@ -672,7 +648,6 @@
             document.getElementById('checkinModal').classList.add('hidden');
         }
 
-        // Save Quick Check-in
         function saveCheckin(e) {
             e.preventDefault();
 
@@ -698,7 +673,6 @@
             closeCheckinModal();
         }
 
-        // Import & Export Modal
         function openImportExportModal() {
             document.getElementById('importExportModal').classList.remove('hidden');
         }
@@ -707,14 +681,12 @@
             document.getElementById('importExportModal').classList.add('hidden');
         }
 
-        // Load Sample Data manually
         function loadSampleData() {
             clients = getSampleData();
             saveData();
             showToast('已載入預設範例資料');
         }
 
-        // Export JSON
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(clients, null, 2));
             const downloadAnchor = document.createElement('a');
@@ -726,7 +698,6 @@
             showToast('已匯出 JSON 備份檔');
         }
 
-        // Export CSV
         function exportCSV() {
             if (clients.length === 0) {
                 showToast('目前沒有資料可供匯出');
@@ -757,7 +728,6 @@
             showToast('已匯出 CSV 檔案');
         }
 
-        // Import JSON
         function importJSON(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -781,7 +751,6 @@
             reader.readAsText(file);
         }
 
-        // Toast Helper
         function showToast(msg) {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toastMsg');
@@ -796,7 +765,6 @@
             }, 2500);
         }
 
-        // Helper HTML Escape
         function escapeHtml(str) {
             if (!str) return '';
             return str
@@ -807,29 +775,46 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // Load saved data safely from LocalStorage
         function loadSavedData() {
-            const savedData = localStorage.getItem('client_visit_data');
-            const hasInitialized = localStorage.getItem('client_visit_initialized');
+            try {
+                let savedData = localStorage.getItem('client_visit_data');
+                if (!savedData) {
+                    savedData = localStorage.getItem('client_visit_data_backup');
+                }
 
-            if (savedData !== null) {
-                try {
+                const hasInitialized = localStorage.getItem('client_visit_initialized');
+
+                if (savedData !== null && savedData !== "") {
                     clients = JSON.parse(savedData);
-                } catch (e) {
-                    console.error('Failed to parse saved data', e);
+                } else if (!hasInitialized) {
+                    clients = getSampleData();
+                    saveData();
+                    localStorage.setItem('client_visit_initialized', 'true');
+                } else {
                     clients = [];
                 }
-            } else if (!hasInitialized) {
-                // Initial launch: set default sample data once
-                clients = getSampleData();
-                localStorage.setItem('client_visit_data', JSON.stringify(clients));
-                localStorage.setItem('client_visit_initialized', 'true');
-            } else {
+            } catch (e) {
+                console.error('Failed to parse saved data', e);
                 clients = [];
             }
         }
 
-        // App Initialization
+        function forceSyncToDisk() {
+            if (clients && clients.length >= 0) {
+                const dataStr = JSON.stringify(clients);
+                localStorage.setItem('client_visit_data', dataStr);
+                localStorage.setItem('client_visit_data_backup', dataStr);
+            }
+        }
+
+        window.addEventListener('pagehide', forceSyncToDisk);
+        window.addEventListener('beforeunload', forceSyncToDisk);
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                forceSyncToDisk();
+            }
+        });
+
         window.onload = function() {
             loadSavedData();
             renderClients();
