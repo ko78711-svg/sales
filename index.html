@@ -98,9 +98,9 @@
             <i class="fa-solid fa-folder-open"></i>
         </div>
         <h3 class="font-bold text-slate-700 text-base">目前沒有客戶拜訪紀錄</h3>
-        <p class="text-xs text-slate-400 mt-1 max-w-xs">點擊上方「新增」建立第一筆資料，或載入範例資料進行體驗。</p>
-        <button onclick="loadSampleData()" class="mt-4 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl font-medium text-xs hover:bg-indigo-100 transition shadow-sm">
-            <i class="fa-solid fa-magic me-1"></i> 載入範例測試資料
+        <p class="text-xs text-slate-400 mt-1 max-w-xs">點擊上方「新增」建立第一筆資料，或下載空白表格填寫後進行匯入。</p>
+        <button onclick="downloadBlankTemplate()" class="mt-4 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl font-medium text-xs hover:bg-indigo-100 transition shadow-sm border border-indigo-200">
+            <i class="fa-solid fa-file-excel me-1 text-emerald-600"></i> 下載空白匯入範本 (CSV)
         </button>
     </div>
 
@@ -231,10 +231,10 @@
             
             <div class="p-5 space-y-4">
                 <div>
-                    <h4 class="font-semibold text-xs text-slate-500 uppercase tracking-wider mb-2">快速測試與範例</h4>
-                    <button onclick="loadSampleData(); closeImportExportModal();" class="w-full py-2.5 px-3 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-700 text-xs font-medium hover:bg-indigo-100 transition flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-magic"></i>
-                        <span>載入預設示範客戶資料</span>
+                    <h4 class="font-semibold text-xs text-slate-500 uppercase tracking-wider mb-2">批次建立資料</h4>
+                    <button onclick="downloadBlankTemplate()" class="w-full py-2.5 px-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-xs font-medium hover:bg-emerald-100 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-file-excel text-base"></i>
+                        <span>下載空白 Excel/CSV 匯入範本</span>
                     </button>
                 </div>
 
@@ -681,10 +681,21 @@
             document.getElementById('importExportModal').classList.add('hidden');
         }
 
-        function loadSampleData() {
-            clients = getSampleData();
-            saveData();
-            showToast('已載入預設範例資料');
+        // Download Blank CSV Template
+        function downloadBlankTemplate() {
+            const csvHeader = "\uFEFF公司名稱,電話,地址,預計拜訪日期(YYYY-MM-DD),拜訪階段(初訪/追蹤中/報價中/成交/暫緩),拜訪紀錄/備忘錄\n";
+            const sampleRow = '"範例公司名稱","02-12345678","台北市信義區信義路五段7號","2026-11-02","初訪","填寫洽談備忘與細節"\n';
+            const csvContent = csvHeader + sampleRow;
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `拜訪名單匯入範本.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('已下載空白匯入範本');
         }
 
         function exportJSON() {
@@ -782,14 +793,8 @@
                     savedData = localStorage.getItem('client_visit_data_backup');
                 }
 
-                const hasInitialized = localStorage.getItem('client_visit_initialized');
-
                 if (savedData !== null && savedData !== "") {
                     clients = JSON.parse(savedData);
-                } else if (!hasInitialized) {
-                    clients = getSampleData();
-                    saveData();
-                    localStorage.setItem('client_visit_initialized', 'true');
                 } else {
                     clients = [];
                 }
