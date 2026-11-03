@@ -279,7 +279,13 @@
 
     <script>
         // State
-        let clients = JSON.parse(localStorage.getItem('client_visit_data')) || [];
+        let clients = [];
+        try {
+            clients = JSON.parse(localStorage.getItem('client_visit_data')) || [];
+        } catch(e) {
+            clients = [];
+        }
+
         let currentTab = 'today';
         let currentStatusFilter = 'ALL';
         let currentCityFilter = 'ALL';
@@ -298,12 +304,12 @@
             if (cityMatch) {
                 city = cityMatch[1];
                 const rest = addr.substring(addr.indexOf(city) + city.length);
-                const distMatch = rest.match(/([^\s0-90-9\-–—_]+?[區鄉鎮市])/);
+                const distMatch = rest.match(/([^\s0-9\-–—_]+?[區鄉鎮市])/);
                 if (distMatch) {
                     district = distMatch[1];
                 }
             } else {
-                const distMatch = addr.match(/([^\s0-90-9\-–—_]+?[區鄉鎮市])/);
+                const distMatch = addr.match(/([^\s0-9\-–—_]+?[區鄉鎮市])/);
                 if (distMatch) {
                     district = distMatch[1];
                 }
