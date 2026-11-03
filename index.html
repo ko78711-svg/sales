@@ -138,8 +138,9 @@
                             <label class="block text-xs font-semibold text-slate-600">產業分類</label>
                             <button type="button" onclick="openIndustryManageModal()" class="text-[10px] text-indigo-600 hover:underline">⚙️ 管理選單</button>
                         </div>
-                        <input type="text" id="companyIndustry" list="industryList" placeholder="選取或直接輸入" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <datalist id="industryList"></datalist>
+                        <select id="companyIndustry" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            <!-- 產業選單項目將由 JS 動態生成 -->
+                        </select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">聯絡電話</label>
@@ -388,7 +389,7 @@
 
         // 更新產業下拉選單與新增視窗的選單
         function updateIndustryDatalist() {
-            const datalist = document.getElementById('industryList');
+            const companyIndustrySelect = document.getElementById('companyIndustry');
             const industryFilterSelect = document.getElementById('industryFilter');
             
             const allIndustries = new Set(customIndustries);
@@ -398,10 +399,18 @@
 
             const sorted = Array.from(allIndustries).sort();
 
-            if (datalist) {
-                datalist.innerHTML = sorted.map(ind => `<option value="${escapeHtml(ind)}">`).join('');
+            // 更新新增/編輯 Modal 中的產業下拉選單
+            if (companyIndustrySelect) {
+                const curVal = companyIndustrySelect.value;
+                let options = '<option value="">未分類 / 請選擇</option>';
+                sorted.forEach(ind => {
+                    options += `<option value="${escapeHtml(ind)}">${escapeHtml(ind)}</option>`;
+                });
+                companyIndustrySelect.innerHTML = options;
+                if (curVal) companyIndustrySelect.value = curVal;
             }
 
+            // 更新頂部篩選器
             if (industryFilterSelect) {
                 const cur = industryFilterSelect.value || 'ALL';
                 let options = '<option value="ALL">所有產業分類</option>';
