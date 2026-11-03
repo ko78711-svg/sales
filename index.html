@@ -50,6 +50,18 @@
         </div>
     </header>
 
+    <!-- Multi-select Route Optimization Floating/Header Action Bar -->
+    <div id="routeActionBar" class="bg-indigo-900 text-white px-3 py-2 flex items-center justify-between text-xs border-b border-indigo-700">
+        <div class="flex items-center space-x-2">
+            <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500">
+            <label for="selectAllCheckbox" class="font-medium cursor-pointer">全選 (<span id="selectedCount">0</span>)</label>
+        </div>
+        <button onclick="planOptimizedRoute()" class="bg-emerald-500 hover:bg-emerald-600 font-semibold px-3 py-1.5 rounded-lg text-white shadow transition flex items-center space-x-1">
+            <i class="fa-solid fa-route text-sm"></i>
+            <span>🗺️ 排出最佳拜訪路線</span>
+        </button>
+    </div>
+
     <!-- Search & Multi-Filter Bar -->
     <div class="bg-white border-b border-slate-200 p-3 space-y-2 z-10">
         <!-- 關鍵字搜尋框 -->
@@ -323,6 +335,7 @@
         let customIndustries = JSON.parse(localStorage.getItem('custom_industries')) || ['物流業', '木業', '五金工程', '電子製造', '餐飲服務'];
         let currentTab = 'today';
         let currentStatusFilter = 'ALL';
+        let selectedClientIds = new Set();
 
         // 預設示範資料 (改為空陣列)
         function getSampleData() {
@@ -338,6 +351,73 @@
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
+        }
+
+        // 多選邏輯
+        function toggleClientSelect(id, checkbox) {
+            if (checkbox.checked) {
+                selectedClientIds.add(id);
+            } else {
+                selectedClientIds.delete(id);
+            }
+            updateSelectCount();
+        }
+
+        function toggleSelectAll(selectAllCb) {
+            const checkboxes = document.querySelectorAll('.client-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = selectAllCb.checked;
+                const id = cb.getAttribute('data-id');
+                if (selectAllCb.checked) {
+                    selectedClientIds.add(id);
+                } else {
+                    selectedClientIds.delete(id);
+                }
+            });
+            updateSelectCount();
+        }
+
+        function updateSelectCount() {
+            const countEl = document.getElementById('selectedCount');
+            if (countEl) countEl.innerText = selectedClientIds.size;
+        }
+
+        // 規劃多點最佳路線並在 Google 地圖開啟
+        function planOptimizedRoute() {
+            if (selectedClientIds.size === 0) {
+                showToast('請先勾選至少一家要拜訪的廠商！');
+                return;
+            }
+
+            const selectedList = clients.filter(c => selectedClientIds.has(c.id) && c.address && c.address.trim());
+            
+            if (selectedList.length === 0) {
+                showToast('勾選的廠商沒有完整地址！');
+                return;
+            }
+
+            // 單家廠商直接開啟導航
+            if (selectedList.length === 1) {
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedList[0].address)}`;
+                window.open(mapUrl, '_blank');
+                return;
+            }
+
+            // 多家廠商：構建 Google Maps Directions 多點路線
+            // 起點: 第一家地址, 終點: 最後一家地址, 途中點: waypoints
+            const origin = encodeURIComponent(selectedList[0].address);
+            const destination = encodeURIComponent(selectedList[selectedList.length - 1].address);
+            
+            let waypoints = '';
+            if (selectedList.length > 2) {
+                const intermediate = selectedList.slice(1, -1).map(c => encodeURIComponent(c.address));
+                waypoints = `&waypoints=${intermediate.join('%7C')}`;
+            }
+
+            // 帶入 Google 地圖多點導航 URL (配合 Google 自動規劃最佳路徑)
+            const googleRouteUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints}&travelmode=driving`;
+            
+            window.open(googleRouteUrl, '_blank');
         }
 
         // 精準解析台灣地址（縣市與鄉鎮區）
@@ -482,6 +562,7 @@
             if (filtered.length === 0) {
                 listEl.innerHTML = '';
                 if (emptyEl) emptyEl.classList.remove('hidden');
+                updateSelectCount();
                 return;
             }
 
@@ -501,21 +582,24 @@
                     dateText = `逾期 (${item.visitDate})`;
                 }
 
-                // 導航只使用純地址 query=item.address
+                const isChecked = selectedClientIds.has(item.id) ? 'checked' : '';
                 const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address || '')}`;
 
                 return `
                 <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition space-y-3">
                     <div class="flex items-start justify-between space-x-2">
-                        <div>
-                            <div class="flex items-center space-x-2 flex-wrap">
-                                <h2 class="font-bold text-slate-800 text-base leading-snug">${escapeHtml(item.name)}</h2>
-                                ${item.industry ? `<span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md font-medium border border-indigo-100">${escapeHtml(item.industry)}</span>` : ''}
-                            </div>
-                            <div class="inline-block mt-1">
-                                <span class="text-[11px] px-2 py-0.5 rounded-full ${dateBadgeClass}">
-                                    <i class="fa-regular fa-calendar me-1"></i>${dateText}
-                                </span>
+                        <div class="flex items-start space-x-2.5">
+                            <input type="checkbox" data-id="${item.id}" ${isChecked} onchange="toggleClientSelect('${item.id}', this)" class="client-checkbox mt-1 w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500">
+                            <div>
+                                <div class="flex items-center space-x-2 flex-wrap">
+                                    <h2 class="font-bold text-slate-800 text-base leading-snug">${escapeHtml(item.name)}</h2>
+                                    ${item.industry ? `<span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md font-medium border border-indigo-100">${escapeHtml(item.industry)}</span>` : ''}
+                                </div>
+                                <div class="inline-block mt-1">
+                                    <span class="text-[11px] px-2 py-0.5 rounded-full ${dateBadgeClass}">
+                                        <i class="fa-regular fa-calendar me-1"></i>${dateText}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <div>
