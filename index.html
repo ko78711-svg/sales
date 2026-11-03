@@ -139,7 +139,12 @@
                             <button type="button" onclick="openIndustryManageModal()" class="text-[10px] text-indigo-600 hover:underline">⚙️ 管理選單</button>
                         </div>
                         <select id="companyIndustry" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-                            <!-- 產業選單項目將由 JS 動態生成 -->
+                            <option value="">未分類 / 請選擇</option>
+                            <option value="物流業">物流業</option>
+                            <option value="木業">木業</option>
+                            <option value="五金工程">五金工程</option>
+                            <option value="電子製造">電子製造</option>
+                            <option value="餐飲服務">餐飲服務</option>
                         </select>
                     </div>
                     <div>
@@ -596,6 +601,7 @@
             document.getElementById('clientId').value = '';
             document.getElementById('clientForm').reset();
             document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+            updateIndustryDatalist();
             document.getElementById('clientModal').classList.remove('hidden');
         }
 
@@ -605,6 +611,7 @@
             document.getElementById('modalTitle').innerText = '編輯客戶紀錄';
             document.getElementById('clientId').value = c.id;
             document.getElementById('companyName').value = c.name;
+            updateIndustryDatalist();
             document.getElementById('companyIndustry').value = c.industry || '';
             document.getElementById('companyPhone').value = c.phone || '';
             document.getElementById('companyAddress').value = c.address;
