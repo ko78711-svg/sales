@@ -17,15 +17,12 @@
             -webkit-tap-highlight-color: transparent;
         }
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 4px;
+            height: 4px;
         }
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
         }
     </style>
 </head>
@@ -35,7 +32,7 @@
     <header class="bg-indigo-600 text-white px-4 py-3.5 shadow-md flex items-center justify-between sticky top-0 z-20">
         <div class="flex items-center space-x-2">
             <div class="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center font-bold text-white shadow">
-                <i class="fa-solid fa-map-location-dot"></i>
+                <i class="fa-solid me-0.5 fa-map-location-dot"></i>
             </div>
             <div>
                 <h1 class="font-bold text-lg leading-tight">拜訪隨身助手</h1>
@@ -43,7 +40,7 @@
             </div>
         </div>
         <div class="flex items-center space-x-2">
-            <button onclick="openImportExportModal()" title="資料匯入/匯出" class="p-2 text-indigo-100 hover:text-white hover:bg-indigo-700/50 rounded-lg transition">
+            <button onclick="openImportExportModal()" title="資料備份" class="p-2 text-indigo-100 hover:text-white hover:bg-indigo-700/50 rounded-lg transition">
                 <i class="fa-solid fa-file-import text-lg"></i>
             </button>
             <button onclick="openAddModal()" class="bg-white text-indigo-600 hover:bg-indigo-50 font-semibold px-3 py-1.5 rounded-lg text-sm shadow transition flex items-center space-x-1">
@@ -53,53 +50,44 @@
         </div>
     </header>
 
-    <!-- Search & Filter Bar -->
+    <!-- Search & Multi-Filter Bar -->
     <div class="bg-white border-b border-slate-200 p-3 space-y-2 z-10">
-        <!-- Search Input -->
+        <!-- 關鍵字搜尋框 -->
         <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-            <input type="text" id="searchInput" oninput="renderClients()" placeholder="搜尋公司、電話、地址或產業..." class="w-full pl-9 pr-8 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+            <input type="text" id="searchInput" oninput="renderClients()" placeholder="搜尋公司、電話、地址、產業..." class="w-full pl-9 pr-8 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
             <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                 <i class="fa-solid fa-circle-xmark text-sm"></i>
             </button>
         </div>
 
-        <!-- City & District Dropdown Filters -->
-        <div class="grid grid-cols-2 gap-2">
-            <div class="relative">
-                <select id="citySelect" onchange="onCityChange()" class="w-full pl-3 pr-7 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none">
-                    <option value="ALL">所有縣市</option>
-                </select>
-                <i class="fa-solid fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] pointer-events-none"></i>
-            </div>
-            <div class="relative">
-                <select id="districtSelect" onchange="onDistrictChange()" class="w-full pl-3 pr-7 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none">
-                    <option value="ALL">所有鄉鎮區</option>
-                </select>
-                <i class="fa-solid fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] pointer-events-none"></i>
-            </div>
-        </div>
-
-        <!-- Industry Pills (Auto generated) -->
-        <div class="flex items-center space-x-1.5 overflow-x-auto pb-0.5 text-xs scrollbar-none" id="industryPills">
-            <!-- Dynamic industry pills render here -->
+        <!-- 區域與產業下拉選單篩選 -->
+        <div class="grid grid-cols-3 gap-1.5">
+            <select id="cityFilter" onchange="onCityChange()" class="w-full px-2 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 truncate">
+                <option value="ALL">所有縣市</option>
+            </select>
+            <select id="districtFilter" onchange="renderClients()" class="w-full px-2 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 truncate">
+                <option value="ALL">所有鄉鎮區</option>
+            </select>
+            <select id="industryFilter" onchange="renderClients()" class="w-full px-2 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 truncate">
+                <option value="ALL">所有產業分類</option>
+            </select>
         </div>
         
-        <!-- Visit Status Pills -->
-        <div class="flex items-center space-x-1.5 overflow-x-auto pb-0.5 text-xs scrollbar-none" id="statusFilterPills">
-            <button onclick="setStatusFilter('ALL')" data-status="ALL" class="filter-pill bg-indigo-600 text-white px-3 py-1 rounded-full font-medium shadow-sm transition whitespace-nowrap">全部階段</button>
-            <button onclick="setStatusFilter('未拜訪')" data-status="未拜訪" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1 rounded-full font-medium transition whitespace-nowrap">未拜訪</button>
-            <button onclick="setStatusFilter('初訪')" data-status="初訪" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1 rounded-full font-medium transition whitespace-nowrap">初訪</button>
-            <button onclick="setStatusFilter('追蹤中')" data-status="追蹤中" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1 rounded-full font-medium transition whitespace-nowrap">追蹤中</button>
-            <button onclick="setStatusFilter('報價中')" data-status="報價中" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1 rounded-full font-medium transition whitespace-nowrap">報價中</button>
-            <button onclick="setStatusFilter('成交')" data-status="成交" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1 rounded-full font-medium transition whitespace-nowrap">成交</button>
-            <button onclick="setStatusFilter('暫緩')" data-status="暫緩" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1 rounded-full font-medium transition whitespace-nowrap">暫緩</button>
+        <!-- 拜訪狀態膠囊按鈕列 -->
+        <div class="flex items-center space-x-1 overflow-x-auto pb-0.5 text-xs scrollbar-none" id="statusFilterPills">
+            <button onclick="setStatusFilter('ALL')" data-status="ALL" class="filter-pill bg-indigo-600 text-white px-2.5 py-1 rounded-full font-medium shadow-sm transition whitespace-nowrap">全部狀態</button>
+            <button onclick="setStatusFilter('初訪')" data-status="初訪" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">初訪</button>
+            <button onclick="setStatusFilter('追蹤中')" data-status="追蹤中" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">追蹤中</button>
+            <button onclick="setStatusFilter('報價中')" data-status="報價中" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">報價中</button>
+            <button onclick="setStatusFilter('成交')" data-status="成交" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">成交</button>
+            <button onclick="setStatusFilter('暫緩')" data-status="暫緩" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">暫緩</button>
         </div>
     </div>
 
     <!-- Main Content List -->
     <main class="flex-1 overflow-y-auto p-3 space-y-3" id="clientList">
-        <!-- Client Cards render dynamically here -->
+        <!-- 卡片清單將在此渲染 -->
     </main>
 
     <!-- Empty State Container -->
@@ -107,8 +95,11 @@
         <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-400 mb-3 text-2xl">
             <i class="fa-solid fa-folder-open"></i>
         </div>
-        <h3 class="font-bold text-slate-700 text-base">目前沒有符合條件的客戶</h3>
-        <p class="text-xs text-slate-400 mt-1 max-w-xs">點擊右上角「新增」建立拜訪名單，或清除目前設下的篩選條件。</p>
+        <h3 class="font-bold text-slate-700 text-base">目前沒有符合的客戶紀錄</h3>
+        <p class="text-xs text-slate-400 mt-1 max-w-xs">點擊上方「新增」建立資料，或載入測試資料。</p>
+        <button onclick="loadSampleData()" class="mt-4 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl font-medium text-xs hover:bg-indigo-100 transition shadow-sm">
+            <i class="fa-solid fa-magic me-1"></i> 載入測試資料
+        </button>
     </div>
 
     <!-- Bottom Tab Navigation -->
@@ -125,7 +116,7 @@
 
     <!-- Add/Edit Client Modal -->
     <div id="clientModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col max-h-[90vh]">
+        <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col max-h-[90vh] animate-slide-up">
             <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
                 <h3 id="modalTitle" class="font-bold text-slate-800 text-lg">新增客戶拜訪</h3>
                 <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1">
@@ -133,7 +124,7 @@
                 </button>
             </div>
             
-            <form id="clientForm" onsubmit="saveClient(event)" class="p-5 space-y-3.5 overflow-y-auto">
+            <form id="clientForm" onsubmit="saveClient(event)" class="p-5 space-y-4 overflow-y-auto">
                 <input type="hidden" id="clientId">
                 
                 <div>
@@ -141,43 +132,46 @@
                     <input type="text" id="companyName" required placeholder="例: 宏泰車業股份有限公司" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">產業屬性 / 分類</label>
-                    <input type="text" id="companyIndustry" list="industryDatalist" placeholder="選取或直接輸入產業 (例: 物流業、工程行)" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <datalist id="industryDatalist"></datalist>
-                </div>
-                
                 <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-semibold text-slate-600">產業分類</label>
+                            <button type="button" onclick="openIndustryManageModal()" class="text-[10px] text-indigo-600 hover:underline">⚙️ 管理選單</button>
+                        </div>
+                        <input type="text" id="companyIndustry" list="industryList" placeholder="選取或直接輸入" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <datalist id="industryList"></datalist>
+                    </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">聯絡電話</label>
                         <input type="tel" id="companyPhone" placeholder="02-23456789" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">預計拜訪日期 *</label>
                         <input type="date" id="visitDate" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">拜訪階段/結果</label>
+                        <select id="visitStatus" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            <option value="初訪">初訪</option>
+                            <option value="追蹤中">追蹤中</option>
+                            <option value="報價中">報價中</option>
+                            <option value="成交">成交</option>
+                            <option value="暫緩">暫緩</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">公司地址 *</label>
-                    <input type="text" id="companyAddress" required placeholder="例: 桃園市中壢區中正路100號" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">拜訪階段/狀態</label>
-                    <select id="visitStatus" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-                        <option value="未拜訪">未拜訪 (Pending)</option>
-                        <option value="初訪">初訪 (Initial Visit)</option>
-                        <option value="追蹤中">追蹤中 (Follow-up)</option>
-                        <option value="報價中">報價中 (Quoting)</option>
-                        <option value="成交">成交 (Closed Deal)</option>
-                        <option value="暫緩">暫緩 (On Hold)</option>
-                    </select>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">公司完整地址 *</label>
+                    <input type="text" id="companyAddress" required placeholder="例: 桃園市中壢區延平路200號" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">拜訪紀錄 / 備忘錄</label>
-                    <textarea id="visitNotes" rows="3" placeholder="記錄客戶需求、相談內容或下次追蹤重點..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <textarea id="visitNotes" rows="3" placeholder="記錄客戶需求、談話重點..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
 
                 <div class="pt-2 flex items-center space-x-3">
@@ -188,9 +182,34 @@
         </div>
     </div>
 
-    <!-- Check-in Modal -->
+    <!-- Industry Management Modal -->
+    <div id="industryManageModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col p-5 space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h3 class="font-bold text-slate-800 text-base">管理常用產業選單</h3>
+                <button onclick="closeIndustryManageModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="flex space-x-2">
+                <input type="text" id="newIndustryInput" placeholder="輸入新產業名稱..." class="flex-1 px-3 py-1.5 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <button onclick="addNewIndustryOption()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-medium hover:bg-indigo-700">新增</button>
+            </div>
+
+            <div class="max-h-48 overflow-y-auto space-y-1.5" id="industryTagsList">
+                <!-- 產業標籤將在此編輯與刪除 -->
+            </div>
+
+            <div class="pt-2 text-right">
+                <button onclick="closeIndustryManageModal()" class="px-4 py-1.5 bg-slate-100 text-slate-600 rounded-xl text-xs font-medium">完成</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Visit / Check-in Modal -->
     <div id="checkinModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col">
+        <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col animate-slide-up">
             <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <h3 class="font-bold text-slate-800 text-lg">快速打卡 / 紀錄拜訪</h3>
@@ -210,20 +229,19 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">更新拜訪階段 *</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">更新拜訪階段/結果 *</label>
                     <select id="checkinStatus" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-                        <option value="未拜訪">未拜訪 (Pending)</option>
-                        <option value="初訪">初訪 (Initial Visit)</option>
-                        <option value="追蹤中">追蹤中 (Follow-up)</option>
-                        <option value="報價中">報價中 (Quoting)</option>
-                        <option value="成交">成交 (Closed Deal)</option>
-                        <option value="暫緩">暫緩 (On Hold)</option>
+                        <option value="初訪">初訪</option>
+                        <option value="追蹤中">追蹤中</option>
+                        <option value="報價中">報價中</option>
+                        <option value="成交">成交</option>
+                        <option value="暫緩">暫緩</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">新增今日拜訪紀錄 *</label>
-                    <textarea id="checkinNotes" rows="4" required placeholder="輸入今日洽談結果與進度..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">新增今日拜訪紀錄 / 備忘錄 *</label>
+                    <textarea id="checkinNotes" rows="4" required placeholder="輸入今日與客戶洽談的結果與進度..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
 
                 <div class="pt-2 flex items-center space-x-3">
@@ -234,9 +252,9 @@
         </div>
     </div>
 
-    <!-- Import / Export Modal -->
+    <!-- Data Import / Export Modal -->
     <div id="importExportModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col">
+        <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col animate-slide-up">
             <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
                 <h3 class="font-bold text-slate-800 text-lg">資料備份與匯入</h3>
                 <button onclick="closeImportExportModal()" class="text-slate-400 hover:text-slate-600 p-1">
@@ -245,6 +263,16 @@
             </div>
             
             <div class="p-5 space-y-4">
+                <div>
+                    <h4 class="font-semibold text-xs text-slate-500 uppercase tracking-wider mb-2">快速操作</h4>
+                    <button onclick="downloadTemplate();" class="w-full py-2.5 px-3 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-700 text-xs font-medium hover:bg-indigo-100 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>下載 CSV 空白匯入範本</span>
+                    </button>
+                </div>
+
+                <hr class="border-slate-100">
+
                 <div class="space-y-2">
                     <h4 class="font-semibold text-xs text-slate-500 uppercase tracking-wider">JSON / CSV 檔案備份</h4>
                     <div class="grid grid-cols-2 gap-2">
@@ -271,198 +299,161 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Alert / Toast Container -->
     <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white text-xs px-4 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-300 flex items-center space-x-2">
         <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toastMsg">訊息通知</span>
     </div>
 
     <script>
-        // State
-        let clients = [];
-        try {
-            clients = JSON.parse(localStorage.getItem('client_visit_data')) || [];
-        } catch(e) {
-            clients = [];
-        }
-
+        // 全域狀態 State
+        let clients = JSON.parse(localStorage.getItem('client_visit_data')) || [];
+        let customIndustries = JSON.parse(localStorage.getItem('custom_industries')) || ['物流業', '木業', '五金工程', '電子製造', '餐飲服務'];
         let currentTab = 'today';
         let currentStatusFilter = 'ALL';
-        let currentCityFilter = 'ALL';
-        let currentDistrictFilter = 'ALL';
-        let currentIndustryFilter = 'ALL';
 
-        // Advanced Taiwan Address Parser (Fixed: strictly prevent city name from being registered as district)
-        function parseAddress(addr) {
-            if (!addr) return { city: '', district: '' };
-            let city = '';
-            let district = '';
+        // 預設示範資料 (改為空陣列)
+        function getSampleData() {
+            return [];
+        }
 
-            const cityRegex = /(基隆市|台北市|臺北市|新北市|桃園市|新竹市|新竹縣|苗栗縣|台中市|臺中市|彰化縣|南投縣|雲林縣|嘉義市|嘉義縣|台南市|臺南市|高雄市|屏東縣|宜蘭縣|花蓮縣|台東縣|臺東縣|澎湖縣|金門縣|連江縣)/;
-            const cityMatch = addr.match(cityRegex);
+        // 全域 HTML 安全過濾
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
-            if (cityMatch) {
-                city = cityMatch[1];
-                // 扣除縣市名稱後的剩餘地址文字，再來匹配鄉鎮區
-                const rest = addr.substring(addr.indexOf(city) + city.length);
-                const distMatch = rest.match(/([^\s0-9\-–—_]+?[區鄉鎮市])/);
-                if (distMatch) {
-                    district = distMatch[1];
-                }
-            } else {
-                const distMatch = addr.match(/([^\s0-9\-–—_]+?[區鄉鎮市])/);
-                if (distMatch) {
-                    // 若沒有匹配到縣市，但匹配出的鄉鎮區不可以是縣市名
-                    const captured = distMatch[1];
-                    if (!captured.endsWith('市') || captured.length <= 3) {
-                        district = captured;
-                    }
-                }
-            }
-
+        // 精準解析台灣地址（縣市與鄉鎮區）
+        function parseAddress(address) {
+            if (!address) return { city: '', district: '' };
+            const cityMatch = address.match(/^(.{2,3}[縣市])/);
+            const city = cityMatch ? cityMatch[1] : '';
+            let remaining = city ? address.replace(city, '') : address;
+            const districtMatch = remaining.match(/^(.{1,4}[區市鎮鄉])/);
+            const district = districtMatch ? districtMatch[1] : '';
             return { city, district };
         }
 
+        // 更新縣市與鄉鎮區下拉選單
+        function updateLocationFilters() {
+            const citySelect = document.getElementById('cityFilter');
+            const districtSelect = document.getElementById('districtFilter');
+            if (!citySelect || !districtSelect) return;
+
+            const selectedCity = citySelect.value || 'ALL';
+            const selectedDistrict = districtSelect.value || 'ALL';
+
+            const cities = new Set();
+            const districtsByCity = {};
+
+            clients.forEach(c => {
+                const { city, district } = parseAddress(c.address);
+                if (city) {
+                    cities.add(city);
+                    if (!districtsByCity[city]) districtsByCity[city] = new Set();
+                    if (district) districtsByCity[city].add(district);
+                }
+            });
+
+            // 選項 HTML 構建
+            let cityHTML = '<option value="ALL">所有縣市</option>';
+            Array.from(cities).sort().forEach(c => {
+                cityHTML += `<option value="${escapeHtml(c)}"${c === selectedCity ? ' selected' : ''}>${escapeHtml(c)}</option>`;
+            });
+            citySelect.innerHTML = cityHTML;
+
+            let distHTML = '<option value="ALL">所有鄉鎮區</option>';
+            let distSet = new Set();
+            if (selectedCity === 'ALL') {
+                Object.values(districtsByCity).forEach(s => s.forEach(d => distSet.add(d)));
+            } else if (districtsByCity[selectedCity]) {
+                districtsByCity[selectedCity].forEach(d => distSet.add(d));
+            }
+
+            Array.from(distSet).sort().forEach(d => {
+                distHTML += `<option value="${escapeHtml(d)}"${d === selectedDistrict ? ' selected' : ''}>${escapeHtml(d)}</option>`;
+            });
+            districtSelect.innerHTML = distHTML;
+        }
+
+        function onCityChange() {
+            updateLocationFilters();
+            renderClients();
+        }
+
+        // 更新產業下拉選單與新增視窗的選單
+        function updateIndustryDatalist() {
+            const datalist = document.getElementById('industryList');
+            const industryFilterSelect = document.getElementById('industryFilter');
+            
+            const allIndustries = new Set(customIndustries);
+            clients.forEach(c => {
+                if (c.industry && c.industry.trim()) allIndustries.add(c.industry.trim());
+            });
+
+            const sorted = Array.from(allIndustries).sort();
+
+            if (datalist) {
+                datalist.innerHTML = sorted.map(ind => `<option value="${escapeHtml(ind)}">`).join('');
+            }
+
+            if (industryFilterSelect) {
+                const cur = industryFilterSelect.value || 'ALL';
+                let options = '<option value="ALL">所有產業分類</option>';
+                sorted.forEach(ind => {
+                    options += `<option value="${escapeHtml(ind)}"${ind === cur ? ' selected' : ''}>${escapeHtml(ind)}</option>`;
+                });
+                industryFilterSelect.innerHTML = options;
+            }
+        }
+
+        // 儲存至本地快取
         function saveData() {
             localStorage.setItem('client_visit_data', JSON.stringify(clients));
-            renderCityDistrictSelectors();
-            renderIndustryPills();
+            localStorage.setItem('custom_industries', JSON.stringify(customIndustries));
+            updateLocationFilters();
             updateIndustryDatalist();
             renderClients();
         }
 
-        // Render City & District Dropdowns
-        function renderCityDistrictSelectors() {
-            const citySelect = document.getElementById('citySelect');
-            if (!citySelect) return;
-
-            const cities = new Set();
-            clients.forEach(c => {
-                const parsed = parseAddress(c.address);
-                if (parsed.city) cities.add(parsed.city);
-            });
-
-            citySelect.innerHTML = `<option value="ALL">所有縣市</option>` + 
-                Array.from(cities).map(c => `<option value="${escapeHtml(c)}" ${currentCityFilter === c ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('');
-
-            updateDistrictOptions();
-        }
-
-        function updateDistrictOptions() {
-            const districtSelect = document.getElementById('districtSelect');
-            if (!districtSelect) return;
-
-            const districts = new Set();
-            clients.forEach(c => {
-                const parsed = parseAddress(c.address);
-                if (currentCityFilter === 'ALL' || parsed.city === currentCityFilter) {
-                    if (parsed.district) districts.add(parsed.district);
-                }
-            });
-
-            districtSelect.innerHTML = `<option value="ALL">所有鄉鎮區</option>` + 
-                Array.from(districts).map(d => `<option value="${escapeHtml(d)}" ${currentDistrictFilter === d ? 'selected' : ''}>${escapeHtml(d)}</option>`).join('');
-        }
-
-        function onCityChange() {
-            currentCityFilter = document.getElementById('citySelect').value;
-            currentDistrictFilter = 'ALL';
-            updateDistrictOptions();
-            renderClients();
-        }
-
-        function onDistrictChange() {
-            currentDistrictFilter = document.getElementById('districtSelect').value;
-            renderClients();
-        }
-
-        // Render Industry Pills
-        function renderIndustryPills() {
-            const pillsContainer = document.getElementById('industryPills');
-            if (!pillsContainer) return;
-
-            const industries = new Set();
-            clients.forEach(c => {
-                if (c.industry && c.industry.trim()) {
-                    industries.add(c.industry.trim());
-                }
-            });
-
-            if (industries.size === 0) {
-                pillsContainer.innerHTML = '';
-                return;
-            }
-
-            let html = `<button onclick="setIndustryFilter('ALL')" class="px-2.5 py-0.5 rounded-full font-medium whitespace-nowrap text-[11px] transition ${currentIndustryFilter === 'ALL' ? 'bg-slate-800 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">所有分類</button>`;
-
-            industries.forEach(ind => {
-                const isSelected = currentIndustryFilter === ind;
-                const cls = isSelected ? 'bg-slate-800 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200';
-                html += `<button onclick="setIndustryFilter('${escapeHtml(ind)}')" class="px-2.5 py-0.5 rounded-full font-medium whitespace-nowrap text-[11px] transition ${cls}">${escapeHtml(ind)}</button>`;
-            });
-
-            pillsContainer.innerHTML = html;
-        }
-
-        function setIndustryFilter(ind) {
-            currentIndustryFilter = ind;
-            renderIndustryPills();
-            renderClients();
-        }
-
-        function updateIndustryDatalist() {
-            const datalist = document.getElementById('industryDatalist');
-            if (!datalist) return;
-
-            const industries = new Set();
-            clients.forEach(c => {
-                if (c.industry && c.industry.trim()) {
-                    industries.add(c.industry.trim());
-                }
-            });
-
-            datalist.innerHTML = Array.from(industries).map(ind => `<option value="${escapeHtml(ind)}">`).join('');
-        }
-
-        function getStatusBadge(status) {
-            const map = {
-                '未拜訪': 'bg-indigo-50 text-indigo-700 border-indigo-200',
-                '初訪': 'bg-sky-100 text-sky-700 border-sky-200',
-                '追蹤中': 'bg-amber-100 text-amber-700 border-amber-200',
-                '報價中': 'bg-purple-100 text-purple-700 border-purple-200',
-                '成交': 'bg-emerald-100 text-emerald-700 border-emerald-200',
-                '暫緩': 'bg-slate-100 text-slate-600 border-slate-200'
-            };
-            const cls = map[status] || 'bg-slate-100 text-slate-600 border-slate-200';
-            return `<span class="px-2.5 py-0.5 rounded-md border text-[11px] font-semibold ${cls}">${escapeHtml(status || '未拜訪')}</span>`;
-        }
-
+        // 渲染客戶清單卡片
         function renderClients() {
             const listEl = document.getElementById('clientList');
             const emptyEl = document.getElementById('emptyState');
-            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+            if (!listEl) return;
+
+            const searchInput = document.getElementById('searchInput');
+            const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            const cityFilter = document.getElementById('cityFilter') ? document.getElementById('cityFilter').value : 'ALL';
+            const districtFilter = document.getElementById('districtFilter') ? document.getElementById('districtFilter').value : 'ALL';
+            const industryFilter = document.getElementById('industryFilter') ? document.getElementById('industryFilter').value : 'ALL';
             const todayStr = new Date().toISOString().split('T')[0];
 
-            document.getElementById('clearSearchBtn').classList.toggle('hidden', searchVal === '');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (clearBtn) clearBtn.classList.toggle('hidden', searchVal === '');
 
+            // 條件篩選
             let filtered = clients.filter(c => {
                 if (currentTab === 'today' && c.visitDate > todayStr) return false;
-                if (currentStatusFilter !== 'ALL' && (c.status || '未拜訪') !== currentStatusFilter) return false;
+                if (currentStatusFilter !== 'ALL' && c.status !== currentStatusFilter) return false;
+                if (industryFilter !== 'ALL' && c.industry !== industryFilter) return false;
 
-                const parsed = parseAddress(c.address);
-                if (currentCityFilter !== 'ALL' && parsed.city !== currentCityFilter) return false;
-                if (currentDistrictFilter !== 'ALL' && parsed.district !== currentDistrictFilter) return false;
-
-                if (currentIndustryFilter !== 'ALL' && (c.industry || '').trim() !== currentIndustryFilter) return false;
+                const { city, district } = parseAddress(c.address);
+                if (cityFilter !== 'ALL' && city !== cityFilter) return false;
+                if (districtFilter !== 'ALL' && district !== districtFilter) return false;
 
                 if (searchVal) {
-                    const matchesName = (c.name || '').toLowerCase().includes(searchVal);
-                    const matchesAddress = (c.address || '').toLowerCase().includes(searchVal);
-                    const matchesPhone = (c.phone || '').includes(searchVal);
-                    const matchesIndustry = (c.industry || '').toLowerCase().includes(searchVal);
-                    return matchesName || matchesAddress || matchesPhone || matchesIndustry;
+                    const mName = (c.name || '').toLowerCase().includes(searchVal);
+                    const mAddr = (c.address || '').toLowerCase().includes(searchVal);
+                    const mPhone = (c.phone || '').includes(searchVal);
+                    const mInd = (c.industry || '').toLowerCase().includes(searchVal);
+                    return mName || mAddr || mPhone || mInd;
                 }
-
                 return true;
             });
 
@@ -470,19 +461,18 @@
 
             if (filtered.length === 0) {
                 listEl.innerHTML = '';
-                emptyEl.classList.remove('hidden');
+                if (emptyEl) emptyEl.classList.remove('hidden');
                 return;
             }
 
-            emptyEl.classList.add('hidden');
-
+            if (emptyEl) emptyEl.classList.add('hidden');
+            
             listEl.innerHTML = filtered.map(item => {
                 const isToday = item.visitDate === todayStr;
                 const isOverdue = item.visitDate < todayStr;
-
                 let dateBadgeClass = 'text-slate-500 bg-slate-100';
                 let dateText = item.visitDate;
-
+                
                 if (isToday) {
                     dateBadgeClass = 'text-indigo-600 bg-indigo-50 border border-indigo-200 font-semibold';
                     dateText = `今日拜訪 (${item.visitDate})`;
@@ -491,27 +481,25 @@
                     dateText = `逾期 (${item.visitDate})`;
                 }
 
-                const parsed = parseAddress(item.address);
-                const regionTag = (parsed.city || parsed.district) ? `${parsed.city}${parsed.district}` : '';
-                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name + ' ' + item.address)}`;
+                // 導航只使用純地址 query=item.address
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address || '')}`;
 
                 return `
                 <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition space-y-3">
                     <div class="flex items-start justify-between space-x-2">
                         <div>
-                            <div class="flex items-center space-x-1.5 flex-wrap gap-y-1">
+                            <div class="flex items-center space-x-2 flex-wrap">
                                 <h2 class="font-bold text-slate-800 text-base leading-snug">${escapeHtml(item.name)}</h2>
-                                ${item.industry ? `<span class="bg-indigo-50 text-indigo-600 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-indigo-100">${escapeHtml(item.industry)}</span>` : ''}
-                                ${regionTag ? `<span class="bg-slate-100 text-slate-600 text-[10px] font-semibold px-2 py-0.5 rounded-full">${escapeHtml(regionTag)}</span>` : ''}
+                                ${item.industry ? `<span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md font-medium border border-indigo-100">${escapeHtml(item.industry)}</span>` : ''}
                             </div>
-                            <div class="inline-block mt-1.5">
-                                <span class="text-[11px] px-2.5 py-0.5 rounded-full ${dateBadgeClass}">
+                            <div class="inline-block mt-1">
+                                <span class="text-[11px] px-2 py-0.5 rounded-full ${dateBadgeClass}">
                                     <i class="fa-regular fa-calendar me-1"></i>${dateText}
                                 </span>
                             </div>
                         </div>
                         <div>
-                            ${getStatusBadge(item.status)}
+                            <span class="px-2.5 py-0.5 rounded-md border text-[11px] font-semibold ${getStatusClass(item.status)}">${escapeHtml(item.status)}</span>
                         </div>
                     </div>
 
@@ -539,17 +527,14 @@
                             <i class="fa-solid fa-diamond-turn-right text-sm mb-0.5"></i>
                             <span>導航</span>
                         </a>
-
                         <button onclick="openCheckinModal('${item.id}')" class="col-span-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl py-2 flex flex-col items-center justify-center text-[11px] font-medium transition shadow-sm">
                             <i class="fa-solid fa-user-check text-sm mb-0.5"></i>
                             <span>打卡</span>
                         </button>
-
                         <button onclick="editClient('${item.id}')" class="col-span-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl py-2 flex flex-col items-center justify-center text-[11px] font-medium transition">
                             <i class="fa-solid fa-pen-to-square text-sm mb-0.5 text-slate-500"></i>
                             <span>編輯</span>
                         </button>
-
                         <button onclick="deleteClient('${item.id}')" class="col-span-1 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-500 rounded-xl py-2 flex flex-col items-center justify-center text-[11px] font-medium transition">
                             <i class="fa-solid fa-trash-can text-sm mb-0.5"></i>
                             <span>刪除</span>
@@ -560,6 +545,18 @@
             }).join('');
         }
 
+        function getStatusClass(status) {
+            const map = {
+                '初訪': 'bg-sky-100 text-sky-700 border-sky-200',
+                '追蹤中': 'bg-amber-100 text-amber-700 border-amber-200',
+                '報價中': 'bg-purple-100 text-purple-700 border-purple-200',
+                '成交': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                '暫緩': 'bg-slate-100 text-slate-600 border-slate-200'
+            };
+            return map[status] || 'bg-slate-100 text-slate-600 border-slate-200';
+        }
+
+        // 分頁與狀態切換
         function switchTab(tab) {
             currentTab = tab;
             document.getElementById('tabToday').className = tab === 'today' ? "py-3 text-indigo-600 border-t-2 border-indigo-600 flex flex-col items-center justify-center transition" : "py-3 text-slate-400 border-t-2 border-transparent hover:text-slate-600 flex flex-col items-center justify-center transition";
@@ -571,9 +568,9 @@
             currentStatusFilter = status;
             document.querySelectorAll('.filter-pill').forEach(pill => {
                 if (pill.getAttribute('data-status') === status) {
-                    pill.className = "filter-pill bg-indigo-600 text-white px-3 py-1 rounded-full font-medium shadow-sm transition whitespace-nowrap";
+                    pill.className = "filter-pill bg-indigo-600 text-white px-2.5 py-1 rounded-full font-medium shadow-sm transition whitespace-nowrap";
                 } else {
-                    pill.className = "filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1 rounded-full font-medium transition whitespace-nowrap";
+                    pill.className = "filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap";
                 }
             });
             renderClients();
@@ -584,30 +581,27 @@
             renderClients();
         }
 
+        // Modal 操作
         function openAddModal() {
             document.getElementById('modalTitle').innerText = '新增客戶拜訪';
             document.getElementById('clientId').value = '';
             document.getElementById('clientForm').reset();
             document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
-            updateIndustryDatalist();
             document.getElementById('clientModal').classList.remove('hidden');
         }
 
         function editClient(id) {
-            const client = clients.find(c => c.id === id);
-            if (!client) return;
-
+            const c = clients.find(item => item.id === id);
+            if (!c) return;
             document.getElementById('modalTitle').innerText = '編輯客戶紀錄';
-            document.getElementById('clientId').value = client.id;
-            document.getElementById('companyName').value = client.name;
-            document.getElementById('companyIndustry').value = client.industry || '';
-            document.getElementById('companyPhone').value = client.phone || '';
-            document.getElementById('companyAddress').value = client.address;
-            document.getElementById('visitDate').value = client.visitDate;
-            document.getElementById('visitStatus').value = client.status || '未拜訪';
-            document.getElementById('visitNotes').value = client.notes || '';
-
-            updateIndustryDatalist();
+            document.getElementById('clientId').value = c.id;
+            document.getElementById('companyName').value = c.name;
+            document.getElementById('companyIndustry').value = c.industry || '';
+            document.getElementById('companyPhone').value = c.phone || '';
+            document.getElementById('companyAddress').value = c.address;
+            document.getElementById('visitDate').value = c.visitDate;
+            document.getElementById('visitStatus').value = c.status;
+            document.getElementById('visitNotes').value = c.notes || '';
             document.getElementById('clientModal').classList.remove('hidden');
         }
 
@@ -617,7 +611,6 @@
 
         function saveClient(e) {
             e.preventDefault();
-
             const id = document.getElementById('clientId').value;
             const name = document.getElementById('companyName').value.trim();
             const industry = document.getElementById('companyIndustry').value.trim();
@@ -627,19 +620,17 @@
             const status = document.getElementById('visitStatus').value;
             const notes = document.getElementById('visitNotes').value.trim();
 
+            if (industry && !customIndustries.includes(industry)) {
+                customIndustries.push(industry);
+            }
+
             if (id) {
-                const index = clients.findIndex(c => c.id === id);
-                if (index !== -1) {
-                    clients[index] = { id, name, industry, phone, address, visitDate, status, notes };
-                    showToast('已成功更新客戶資料');
-                }
+                const idx = clients.findIndex(c => c.id === id);
+                if (idx !== -1) clients[idx] = { id, name, industry, phone, address, visitDate, status, notes };
+                showToast('已更新客戶資料');
             } else {
-                const newClient = {
-                    id: 'client-' + Date.now(),
-                    name, industry, phone, address, visitDate, status, notes
-                };
-                clients.push(newClient);
-                showToast('已新增客戶拜訪紀錄');
+                clients.push({ id: 'client-' + Date.now(), name, industry, phone, address, visitDate, status, notes });
+                showToast('已新增客戶拜訪');
             }
 
             saveData();
@@ -647,57 +638,65 @@
         }
 
         function deleteClient(id) {
-            const client = clients.find(c => c.id === id);
-            if (!client) return;
-
-            if (confirm(`確定要刪除「${client.name}」的拜訪紀錄嗎？`)) {
-                clients = clients.filter(c => c.id !== id);
+            const c = clients.find(item => item.id === id);
+            if (!c) return;
+            if (confirm(`確定刪除「${c.name}」嗎？`)) {
+                clients = clients.filter(item => item.id !== id);
                 saveData();
-                showToast('資料已成功刪除');
+                showToast('已成功刪除');
             }
         }
 
-        function openCheckinModal(id) {
-            const client = clients.find(c => c.id === id);
-            if (!client) return;
-
-            document.getElementById('checkinClientId').value = client.id;
-            document.getElementById('checkinCompanyName').innerText = client.name;
-            document.getElementById('checkinStatus').value = client.status || '未拜訪';
-            document.getElementById('checkinNotes').value = '';
-
-            document.getElementById('checkinModal').classList.remove('hidden');
+        // 產業選單管理
+        function openIndustryManageModal() {
+            renderIndustryTags();
+            document.getElementById('industryManageModal').classList.remove('hidden');
+        }
+        function closeIndustryManageModal() {
+            document.getElementById('industryManageModal').classList.add('hidden');
+        }
+        function renderIndustryTags() {
+            const container = document.getElementById('industryTagsList');
+            container.innerHTML = customIndustries.map((ind, idx) => `
+                <div class="flex items-center justify-between bg-slate-50 px-3 py-1.5 rounded-lg border text-xs">
+                    <span class="font-medium text-slate-700">${escapeHtml(ind)}</span>
+                    <button onclick="removeIndustryOption(${idx})" class="text-rose-500 hover:text-rose-700">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+        function addNewIndustryOption() {
+            const input = document.getElementById('newIndustryInput');
+            const val = input.value.trim();
+            if (val && !customIndustries.includes(val)) {
+                customIndustries.push(val);
+                input.value = '';
+                saveData();
+                renderIndustryTags();
+            }
+        }
+        function removeIndustryOption(idx) {
+            customIndustries.splice(idx, 1);
+            saveData();
+            renderIndustryTags();
         }
 
+        // 打卡與備份
+        function openCheckinModal(id) {
+            const c = clients.find(item => item.id === id);
+            if (!c) return;
+            document.getElementById('checkinClientId').value = c.id;
+            document.getElementById('checkinCompanyName').innerText = c.name;
+            document.getElementById('checkinStatus').value = c.status;
+            document.getElementById('checkinNotes').value = '';
+            document.getElementById('checkinModal').classList.remove('hidden');
+        }
         function closeCheckinModal() {
             document.getElementById('checkinModal').classList.add('hidden');
         }
 
-        function saveCheckin(e) {
-            e.preventDefault();
-
-            const id = document.getElementById('checkinClientId').value;
-            const status = document.getElementById('checkinStatus').value;
-            const newNotes = document.getElementById('checkinNotes').value.trim();
-            const todayStr = new Date().toISOString().split('T')[0];
-
-            const index = clients.findIndex(c => c.id === id);
-            if (index !== -1) {
-                const oldNotes = clients[index].notes || '';
-                const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const appendNotes = `[${todayStr} ${timestamp} 打卡紀錄]\n${newNotes}` + (oldNotes ? `\n\n${oldNotes}` : '');
-
-                clients[index].visitDate = todayStr;
-                clients[index].status = status;
-                clients[index].notes = appendNotes;
-
-                saveData();
-                showToast('打卡完成！拜訪日期與紀錄已更新');
-            }
-
-            closeCheckinModal();
-        }
-
+        // Import & Export Modal
         function openImportExportModal() {
             document.getElementById('importExportModal').classList.remove('hidden');
         }
@@ -706,98 +705,81 @@
             document.getElementById('importExportModal').classList.add('hidden');
         }
 
-        function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(clients, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `client_visits_${new Date().toISOString().split('T')[0]}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            showToast('已匯出 JSON 備份檔');
-        }
-
-        function exportCSV() {
-            if (clients.length === 0) {
-                showToast('目前沒有資料可供匯出');
-                return;
-            }
-
-            let csvContent = "\uFEFF公司名稱,產業分類,電話,地址,拜訪日期,拜訪階段,拜訪紀錄\n";
-            clients.forEach(c => {
-                const row = [
-                    `"${(c.name || '').replace(/"/g, '""')}"`,
-                    `"${(c.industry || '').replace(/"/g, '""')}"`,
-                    `"${(c.phone || '').replace(/"/g, '""')}"`,
-                    `"${(c.address || '').replace(/"/g, '""')}"`,
-                    `"${c.visitDate}"`,
-                    `"${c.status || '未拜訪'}"`,
-                    `"${(c.notes || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`
-                ];
-                csvContent += row.join(",") + "\n";
-            });
-
+        // 下載空白 CSV 匯入範本
+        function downloadTemplate() {
+            let csvContent = "\uFEFF公司名稱,產業分類,電話,地址,預計拜訪日期,拜訪階段,拜訪紀錄\n";
+            csvContent += '"範例公司(請刪除本行)","物流業","02-12345678","桃園市中壢區延平路100號","2026-11-15","初訪","初步拜訪聯絡人"';
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.setAttribute("href", url);
-            link.setAttribute("download", `client_visits_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute("download", `客戶拜訪匯入範本.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('已匯出 CSV 檔案');
+            showToast('已下載空白匯入範本');
         }
 
-        function importJSON(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        // Export JSON
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(clients, null, 2));
+            const a = document.createElement('a');
+            a.href = dataStr;
+            a.download = `client_visits_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            showToast('已匯出 JSON');
+        }
 
+        function exportCSV() {
+            if (clients.length === 0) return showToast('目前無資料');
+            let csv = "\uFEFF公司名稱,產業分類,電話,地址,拜訪日期,拜訪階段,拜訪紀錄\n";
+            clients.forEach(c => {
+                csv += `"${(c.name||'')}","${(c.industry||'')}","${(c.phone||'')}","${(c.address||'')}","${c.visitDate}","${c.status}","${(c.notes||'').replace(/\n/g,' ')}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `client_visits_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            showToast('已匯出 CSV');
+        }
+
+        function importJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function(evt) {
                 try {
-                    const imported = JSON.parse(e.target.result);
+                    const imported = JSON.parse(evt.target.result);
                     if (Array.isArray(imported)) {
                         clients = imported;
                         saveData();
                         closeImportExportModal();
-                        showToast('已成功匯入資料！');
-                    } else {
-                        alert('匯入失敗：檔案格式不正確');
+                        showToast('匯入成功！');
                     }
-                } catch (err) {
-                    alert('解析檔案失敗，請確認是否為有效的 JSON 檔案。');
-                }
+                } catch(err) { alert('解析檔案失敗'); }
             };
             reader.readAsText(file);
         }
 
         function showToast(msg) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMsg');
-            toastMsg.innerText = msg;
-
-            toast.classList.remove('opacity-0', 'pointer-events-none');
-            toast.classList.add('opacity-100');
-
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            t.classList.remove('opacity-0', 'pointer-events-none');
+            t.classList.add('opacity-100');
             setTimeout(() => {
-                toast.classList.remove('opacity-100');
-                toast.classList.add('opacity-0', 'pointer-events-none');
+                t.classList.remove('opacity-100');
+                t.classList.add('opacity-0', 'pointer-events-none');
             }, 2500);
         }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
+        // 頁面初始化
         window.onload = function() {
-            renderCityDistrictSelectors();
-            renderIndustryPills();
+            if (!localStorage.getItem('client_visit_data')) {
+                clients = [];
+                localStorage.setItem('client_visit_data', JSON.stringify(clients));
+            }
+            updateLocationFilters();
             updateIndustryDatalist();
             renderClients();
         };
