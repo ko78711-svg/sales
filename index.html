@@ -91,7 +91,7 @@
             </select>
         </div>
         
-        <!-- 拜訪狀態膠囊按鈕列 -->
+        <!-- 拜訪狀態膠囊按鈕列 (順序: 未拜訪 -> 初訪 -> 報價中 -> 追蹤中 -> 成交 -> 暫緩) -->
         <div class="flex items-center space-x-1 overflow-x-auto pb-0.5 text-xs scrollbar-none" id="statusFilterPills">
             <button onclick="setStatusFilter('ALL')" data-status="ALL" class="filter-pill bg-indigo-600 text-white px-2.5 py-1 rounded-full font-medium shadow-sm transition whitespace-nowrap">全部狀態</button>
             <button onclick="setStatusFilter('未拜訪')" data-status="未拜訪" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">未拜訪</button>
