@@ -96,8 +96,8 @@
             <button onclick="setStatusFilter('ALL')" data-status="ALL" class="filter-pill bg-indigo-600 text-white px-2.5 py-1 rounded-full font-medium shadow-sm transition whitespace-nowrap">全部狀態</button>
             <button onclick="setStatusFilter('未拜訪')" data-status="未拜訪" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">未拜訪</button>
             <button onclick="setStatusFilter('初訪')" data-status="初訪" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">初訪</button>
-            <button onclick="setStatusFilter('追蹤中')" data-status="追蹤中" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">追蹤中</button>
             <button onclick="setStatusFilter('報價中')" data-status="報價中" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">報價中</button>
+            <button onclick="setStatusFilter('追蹤中')" data-status="追蹤中" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">追蹤中</button>
             <button onclick="setStatusFilter('成交')" data-status="成交" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">成交</button>
             <button onclick="setStatusFilter('暫緩')" data-status="暫緩" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium transition whitespace-nowrap">暫緩</button>
         </div>
@@ -182,8 +182,8 @@
                         <select id="visitStatus" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
                             <option value="未拜訪">未拜訪</option>
                             <option value="初訪">初訪</option>
-                            <option value="追蹤中">追蹤中</option>
                             <option value="報價中">報價中</option>
+                            <option value="追蹤中">追蹤中</option>
                             <option value="成交">成交</option>
                             <option value="暫緩">暫緩</option>
                         </select>
@@ -259,8 +259,8 @@
                     <select id="checkinStatus" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
                         <option value="未拜訪">未拜訪</option>
                         <option value="初訪">初訪</option>
-                        <option value="追蹤中">追蹤中</option>
                         <option value="報價中">報價中</option>
+                        <option value="追蹤中">追蹤中</option>
                         <option value="成交">成交</option>
                         <option value="暫緩">暫緩</option>
                     </select>
@@ -656,8 +656,8 @@
             const map = {
                 '未拜訪': 'bg-cyan-100 text-cyan-700 border-cyan-200',
                 '初訪': 'bg-sky-100 text-sky-700 border-sky-200',
-                '追蹤中': 'bg-amber-100 text-amber-700 border-amber-200',
                 '報價中': 'bg-purple-100 text-purple-700 border-purple-200',
+                '追蹤中': 'bg-amber-100 text-amber-700 border-amber-200',
                 '成交': 'bg-emerald-100 text-emerald-700 border-emerald-200',
                 '暫緩': 'bg-slate-100 text-slate-600 border-slate-200'
             };
