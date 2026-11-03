@@ -286,7 +286,7 @@
         let currentDistrictFilter = 'ALL';
         let currentIndustryFilter = 'ALL';
 
-        // Helper: Robust Taiwan Address Parser
+        // Advanced Taiwan Address Parser
         function parseAddress(addr) {
             if (!addr) return { city: '', district: '' };
             let city = '';
@@ -297,8 +297,8 @@
 
             if (cityMatch) {
                 city = cityMatch[1];
-                const afterCity = addr.substring(addr.indexOf(city) + city.length);
-                const distMatch = afterCity.match(/^([^\s0-90-9\-–—_]+?[區鄉鎮市])/);
+                const rest = addr.substring(addr.indexOf(city) + city.length);
+                const distMatch = rest.match(/([^\s0-90-9\-–—_]+?[區鄉鎮市])/);
                 if (distMatch) {
                     district = distMatch[1];
                 }
@@ -320,7 +320,7 @@
             renderClients();
         }
 
-        // Render City & District Selectors
+        // Render City & District Dropdowns
         function renderCityDistrictSelectors() {
             const citySelect = document.getElementById('citySelect');
             if (!citySelect) return;
@@ -365,7 +365,7 @@
             renderClients();
         }
 
-        // Render Industry Filter Pills
+        // Render Industry Pills
         function renderIndustryPills() {
             const pillsContainer = document.getElementById('industryPills');
             if (!pillsContainer) return;
