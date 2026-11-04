@@ -618,10 +618,10 @@
 
                     <div class="text-xs text-slate-600 space-y-1.5 bg-slate-50 p-2.5 rounded-xl">
                         ${item.contact ? `
-                        <div class="flex items-center text-slate-700">
+                        <div class="flex items-center text-slate-700 font-medium">
                             <i class="fa-solid fa-user-tag w-4 text-indigo-500 flex-shrink-0"></i>
-                            <span class="font-medium me-1">聯絡人：</span>
-                            <span>${escapeHtml(item.contact)}</span>
+                            <span class="text-slate-500 me-1">聯絡人：</span>
+                            <span class="text-indigo-900 font-semibold">${escapeHtml(item.contact)}</span>
                         </div>
                         ` : ''}
                         <div class="flex items-center text-slate-700">
