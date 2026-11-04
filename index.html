@@ -67,7 +67,7 @@
         <!-- 關鍵字搜尋框 -->
         <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-            <input type="text" id="searchInput" oninput="renderClients()" placeholder="搜尋公司、電話、地址、產業..." class="w-full pl-9 pr-8 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+            <input type="text" id="searchInput" oninput="renderClients()" placeholder="搜尋公司、聯絡人、電話、地址、產業..." class="w-full pl-9 pr-8 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
             <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                 <i class="fa-solid fa-circle-xmark text-sm"></i>
             </button>
@@ -145,9 +145,15 @@
             <form id="clientForm" onsubmit="saveClient(event)" class="p-5 space-y-4 overflow-y-auto">
                 <input type="hidden" id="clientId">
                 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">公司名稱 *</label>
-                    <input type="text" id="companyName" required placeholder="例: 宏泰車業股份有限公司" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">公司名稱 *</label>
+                        <input type="text" id="companyName" required placeholder="例: 宏泰車業股份有限公司" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="col-span-1">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">聯絡人</label>
+                        <input type="text" id="companyContact" placeholder="陳經理" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -407,7 +413,6 @@
             }
 
             // 多家廠商：構建 Google Maps Directions 多點路線
-            // 起點: 第一家地址, 終點: 最後一家地址, 途中點: waypoints
             const origin = encodeURIComponent(selectedList[0].address);
             const destination = encodeURIComponent(selectedList[selectedList.length - 1].address);
             
@@ -552,10 +557,11 @@
 
                 if (searchVal) {
                     const mName = (c.name || '').toLowerCase().includes(searchVal);
+                    const mContact = (c.contact || '').toLowerCase().includes(searchVal);
                     const mAddr = (c.address || '').toLowerCase().includes(searchVal);
                     const mPhone = (c.phone || '').includes(searchVal);
                     const mInd = (c.industry || '').toLowerCase().includes(searchVal);
-                    return mName || mAddr || mPhone || mInd;
+                    return mName || mContact || mAddr || mPhone || mInd;
                 }
                 return true;
             });
@@ -611,6 +617,13 @@
                     </div>
 
                     <div class="text-xs text-slate-600 space-y-1.5 bg-slate-50 p-2.5 rounded-xl">
+                        ${item.contact ? `
+                        <div class="flex items-center text-slate-700 font-medium">
+                            <i class="fa-solid fa-user-tag w-4 text-indigo-500 flex-shrink-0"></i>
+                            <span class="text-slate-500 me-1">聯絡人：</span>
+                            <span class="text-indigo-900 font-semibold">${escapeHtml(item.contact)}</span>
+                        </div>
+                        ` : ''}
                         <div class="flex items-center text-slate-700">
                             <i class="fa-solid fa-location-dot w-4 text-indigo-500 flex-shrink-0"></i>
                             <span class="truncate">${escapeHtml(item.address)}</span>
@@ -709,6 +722,7 @@
             document.getElementById('modalTitle').innerText = '編輯客戶紀錄';
             document.getElementById('clientId').value = c.id;
             document.getElementById('companyName').value = c.name;
+            document.getElementById('companyContact').value = c.contact || '';
             
             updateIndustryDatalist();
             setTimeout(() => {
@@ -731,6 +745,7 @@
             e.preventDefault();
             const id = document.getElementById('clientId').value;
             const name = document.getElementById('companyName').value.trim();
+            const contact = document.getElementById('companyContact').value.trim();
             const industry = document.getElementById('companyIndustry').value.trim();
             const phone = document.getElementById('companyPhone').value.trim();
             const address = document.getElementById('companyAddress').value.trim();
@@ -744,10 +759,10 @@
 
             if (id) {
                 const idx = clients.findIndex(c => c.id === id);
-                if (idx !== -1) clients[idx] = { id, name, industry, phone, address, visitDate, status, notes };
+                if (idx !== -1) clients[idx] = { id, name, contact, industry, phone, address, visitDate, status, notes };
                 showToast('已更新客戶資料');
             } else {
-                clients.push({ id: 'client-' + Date.now(), name, industry, phone, address, visitDate, status, notes });
+                clients.push({ id: 'client-' + Date.now(), name, contact, industry, phone, address, visitDate, status, notes });
                 showToast('已新增客戶拜訪');
             }
 
@@ -825,8 +840,8 @@
 
         // 下載空白 CSV 匯入範本
         function downloadTemplate() {
-            let csvContent = "\uFEFF公司名稱,產業分類,電話,地址,預計拜訪日期,拜訪階段,拜訪紀錄\n";
-            csvContent += '"範例公司(請刪除本行)","物流業","02-12345678","桃園市中壢區延平路100號","2026-11-15","初訪","初步拜訪聯絡人"';
+            let csvContent = "\uFEFF公司名稱,聯絡人,產業分類,電話,地址,預計拜訪日期,拜訪階段,拜訪紀錄\n";
+            csvContent += '"範例公司(請刪除本行)","陳經理","物流業","02-12345678","桃園市中壢區延平路100號","2026-11-15","初訪","初步拜訪聯絡人"';
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
@@ -850,9 +865,9 @@
 
         function exportCSV() {
             if (clients.length === 0) return showToast('目前無資料');
-            let csv = "\uFEFF公司名稱,產業分類,電話,地址,拜訪日期,拜訪階段,拜訪紀錄\n";
+            let csv = "\uFEFF公司名稱,聯絡人,產業分類,電話,地址,拜訪日期,拜訪階段,拜訪紀錄\n";
             clients.forEach(c => {
-                csv += `"${(c.name||'')}","${(c.industry||'')}","${(c.phone||'')}","${(c.address||'')}","${c.visitDate}","${c.status}","${(c.notes||'').replace(/\n/g,' ')}"\n`;
+                csv += `"${(c.name||'')}","${(c.contact||'')}","${(c.industry||'')}","${(c.phone||'')}","${(c.address||'')}","${c.visitDate}","${c.status}","${(c.notes||'').replace(/\n/g,' ')}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const a = document.createElement('a');
