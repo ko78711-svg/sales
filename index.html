@@ -829,6 +829,40 @@
             document.getElementById('checkinModal').classList.add('hidden');
         }
 
+        // 儲存快速打卡紀錄（自動更新日期、階段並加上時間戳記備註）
+        function saveCheckin(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('checkinClientId').value;
+            const status = document.getElementById('checkinStatus').value;
+            const newNotes = document.getElementById('checkinNotes').value.trim();
+            
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
+            
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const timeStr = `${hours}:${minutes}`;
+
+            const index = clients.findIndex(c => c.id === id);
+            if (index !== -1) {
+                const oldNotes = clients[index].notes || '';
+                const appendNotes = `[${todayStr} ${timeStr} 打卡紀錄]\n${newNotes}` + (oldNotes ? `\n\n${oldNotes}` : '');
+
+                clients[index].visitDate = todayStr;
+                clients[index].status = status;
+                clients[index].notes = appendNotes;
+
+                saveData();
+                showToast('打卡完成！已更新日期與時間備註');
+            }
+
+            closeCheckinModal();
+        }
+
         // Import & Export Modal
         function openImportExportModal() {
             document.getElementById('importExportModal').classList.remove('hidden');
